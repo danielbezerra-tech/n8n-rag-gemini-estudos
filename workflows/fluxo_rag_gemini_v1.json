@@ -1,0 +1,279 @@
+{
+  "name": "RAG v.1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -448
+      ],
+      "id": "6c1ad634-0dae-4089-99d0-b33d27aaf07e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f40f39a7-6fbb-4b2a-85e2-6ac8d31346ea",
+              "name": "text",
+              "value": "Desde 2013, o Ami Café se dedica a criar um espaço de crescimento e desenvolvimento no universo dos cafés e chás especiais. Nosso objetivo é oferecer produtos de alta qualidade, enquanto formamos tanto profissionais quanto consumidores conscientes. nossa loja é um centro de aprendizado para entusiastas e profissionais do setor. Oferecemos uma variedade de cursos sobre cafés e chás, utilizando equipamentos e acessórios de ponta. Nossos instrutores são experientes e estão sempre atualizados com as últimas práticas e teorias do mercado. Funcionamentos de segunda a sábado das 8:00 às 20:00.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        -448
+      ],
+      "id": "b6d041ea-b6f2-46a4-b090-556732d947f1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        -448
+      ],
+      "id": "0a7d343f-9a14-446c-85ce-7aca0f4d7f5b",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -240
+      ],
+      "id": "d686f086-3e84-485f-be6b-2575bedc63eb",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OTiF4ImGzlzBviht",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -240
+      ],
+      "id": "a0770824-2405-4552-97e0-eebd365bcb81",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -736,
+        -80
+      ],
+      "id": "0f013929-8007-4d0e-8932-35448b8705bd",
+      "name": "When chat message received",
+      "webhookId": "5c2638aa-2f3e-41e3-aef9-82c2ffc15cc2"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        },
+        "prompt": "={{ $json.chatInput }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        -80
+      ],
+      "id": "1988cf12-1a98-4702-a1d4-985ecc8a7be5",
+      "name": "Simple Vector Store1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        112
+      ],
+      "id": "4018e1f5-37d9-48c4-82f3-ad239f4ffb0c",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OTiF4ImGzlzBviht",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Responda de forma direta e natural sem mencionar o contexto ou fontes.\nVocê pode fazer inferências lógicas diretamente sustentadas pelo contexto. Se o contexto contiver informações suficientes para concluir a resposta, responda de forma direta e clara.\nSomente diga \"Não encontrei essa informação.\" quando o contexto realmente não fornecer informações suficientes para responder. Não utilize conhecimento externo.\nPergunta:\n{{ $('When chat message received').item.json.chatInput }}\nContexto:\n{{ $json.document.pageContent }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -144,
+        -80
+      ],
+      "id": "d59934eb-e20b-41e8-9d75-76c8bbb8518f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -144,
+        112
+      ],
+      "id": "386d20c0-c823-4843-94f3-c5041a22c0ed",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "OTiF4ImGzlzBviht",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1468b887-e904-4610-8b10-642009e83734",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d466c2ee05b04e89f098607bc90e27f03d883ad618e5541e763bd9a60cb283f7"
+  },
+  "nodeGroups": [],
+  "id": "8XnHELCohckAsSil",
+  "tags": []
+}
